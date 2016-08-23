@@ -77,6 +77,7 @@ LICENSE file.
     <geode.version>1.0.0-incubating.M2</geode.version>
     <googlebigtable.version>0.2.3</googlebigtable.version>
     <infinispan.version>7.2.2.Final</infinispan.version>
+    <keyvaluestoreso.version>1.0.0</keyvaluestoreso.version>
     <kudu.version>0.9.0</kudu.version>
     <openjpa.jdbc.version>2.1.1</openjpa.jdbc.version>
     <!--<mapkeeper.version>1.0</mapkeeper.version>-->
@@ -123,6 +124,7 @@ LICENSE file.
     <module>infinispan</module>
     <module>jdbc</module>
     <module>kudu</module>
+    <module>keyvaluestoreso</module>
     <!--<module>mapkeeper</module>-->
     <module>memcached</module>
     <module>mongodb</module>
