@@ -25,10 +25,17 @@ import com.yahoo.ycsb.ByteIterator;
 import com.yahoo.ycsb.DB;
 import com.yahoo.ycsb.DBException;
 import com.yahoo.ycsb.Status;
+import com.yahoo.ycsb.StringByteIterator;
 
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
+import java.util.Properties;
+
+import java.io.*;
+import java.net.*;
+
 //import java.lang.UnsupportedOperationException;
 
 /**
@@ -39,28 +46,40 @@ import java.util.Vector;
 public class KeyValueStoreSOClient extends DB {
 
   public static final String HOST_PROPERTY = "ip";
-  public static final String PORT_PROPERTY = "port";
+  public static final String PORT_PROPERTY = "puerto";
+
+  private Socket cliente = null;
+  private PrintStream os = null;
+  private DataInputStream is = null;
 
   public void init() throws DBException {
-    /*Properties props = getProperties();
-    int port;
+    System.out.println("<<<KeyStoreValueSO>>> INIT");
+
+    Properties props = getProperties();
+    int puerto;
 
     String portString = props.getProperty(PORT_PROPERTY);
     if (portString != null) {
-      port = Integer.parseInt(portString);
+      puerto = Integer.parseInt(portString);
     } else {
-      port = Protocol.DEFAULT_PORT;
+      puerto = 80;
     }
-    String host = props.getProperty(HOST_PROPERTY);
+    String ipServidor = props.getProperty(HOST_PROPERTY);
 
-    jedis = new Jedis(host, port);
-    jedis.connect();
+    System.out.println("<<<KeyStoreValueSO>>> puerto: " + puerto);
+    System.out.println("<<<KeyStoreValueSO>>> ip: " + ipServidor);
 
-    String password = props.getProperty(PASSWORD_PROPERTY);
-    if (password != null) {
-      jedis.auth(password);
-    }*/
-    System.out.println("<<<KeyStoreValueSO>>> INIT");
+    try {
+
+      cliente = new Socket(ipServidor, puerto);
+      os = new PrintStream(cliente.getOutputStream());
+      is = new DataInputStream(cliente.getInputStream());
+
+    } catch (UnknownHostException excepcion) {
+      System.err.println("ERROR: El servidor no está levantado");
+    } catch (IOException e) {
+      System.err.println("ERROR: " + e);
+    }
   }
 
   public void cleanup() throws DBException {
@@ -82,38 +101,64 @@ public class KeyValueStoreSOClient extends DB {
   @Override
   public Status read(String table, String key, Set<String> fields,
       HashMap<String, ByteIterator> result) {
-    /*if (fields == null) {
-      StringByteIterator.putAllAsByteIterators(result, jedis.hgetAll(key));
-    } else {
-      String[] fieldArray =
-          (String[]) fields.toArray(new String[fields.size()]);
-      List<String> values = jedis.hmget(key, fieldArray);
+    System.out.println("<<<KeyStoreValueSO>>> table: " + table);
+    System.out.println("<<<KeyStoreValueSO>>> key: " + key);
 
-      Iterator<String> fieldIterator = fields.iterator();
-      Iterator<String> valueIterator = values.iterator();
+    for(String field : fields) {
+      System.out.println("<<<KeyStoreValueSO>>> field: " + field);
 
-      while (fieldIterator.hasNext() && valueIterator.hasNext()) {
-        result.put(fieldIterator.next(),
-            new StringByteIterator(valueIterator.next()));
+      try {
+        os.println("get " + field);
+        String response = is.readLine();
+        System.out.println("<<<KeyStoreValueSO>>> response: " + response);
+
+        if (!"Key=".equals(response)) {
+          result.put(field, new StringByteIterator(response));
+        }
+      } catch(UnknownHostException e) {
+        System.err.println("ERROR: Trying to connect to unknown host " + e);
+      } catch (IOException e) {
+        System.err.println("ERROR: IOException - " + e);
       }
-      assert !fieldIterator.hasNext() && !valueIterator.hasNext();
     }
-    return result.isEmpty() ? Status.ERROR : Status.OK;*/
+
     System.out.println("<<<KeyStoreValueSO>>> READ");
-    throw new UnsupportedOperationException("OPERACION READ NO SOPORTADA.");
+
+    return result.isEmpty() ? Status.ERROR : Status.OK;
   }
 
   @Override
   public Status insert(String table, String key,
       HashMap<String, ByteIterator> values) {
-    /*if (jedis.hmset(key, StringByteIterator.getStringMap(values))
-        .equals("OK")) {
-      jedis.zadd(INDEX_KEY, hash(key), key);
-      return Status.OK;
+    System.out.println("<<<KeyStoreValueSO>>> table: " + table);
+    System.out.println("<<<KeyStoreValueSO>>> key: " + key);
+    
+    for(Map.Entry<String, ByteIterator> entry : values.entrySet()) {
+      String key1 = entry.getKey();
+      ByteIterator value1 = entry.getValue();
+      System.out.println("<<<KeyStoreValueSO>>> key1: " + key1);
+      System.out.println("<<<KeyStoreValueSO>>> value1: " + value1);
+
+      try {
+        os.println("set " + key1 + " " + value1);
+        String response = is.readLine();
+        System.out.println("<<<KeyStoreValueSO>>> response: " + response);
+
+        if ("OK".equals(response)) {
+          return Status.OK;
+        } else {
+          return Status.ERROR;
+        }
+      } catch(UnknownHostException e) {
+        System.err.println("ERROR: Trying to connect to unknown host " + e);
+      } catch (IOException e) {
+        System.err.println("ERROR: IOException - " + e);
+      }
     }
-    return Status.ERROR;*/
+
     System.out.println("<<<KeyStoreValueSO>>> INSERT");
-    throw new UnsupportedOperationException("OPERACION INSERT NO SOPORTADA.");
+
+    return Status.OK;
   }
 
   @Override
@@ -127,10 +172,35 @@ public class KeyValueStoreSOClient extends DB {
   @Override
   public Status update(String table, String key,
       HashMap<String, ByteIterator> values) {
-    /*return jedis.hmset(key, StringByteIterator.getStringMap(values))
-        .equals("OK") ? Status.OK : Status.ERROR;*/
+    System.out.println("<<<KeyStoreValueSO>>> table: " + table);
+    System.out.println("<<<KeyStoreValueSO>>> key: " + key);
+
+    for(Map.Entry<String, ByteIterator> entry : values.entrySet()) {
+      String key1 = entry.getKey();
+      ByteIterator value1 = entry.getValue();
+      System.out.println("<<<KeyStoreValueSO>>> key1: " + key1);
+      System.out.println("<<<KeyStoreValueSO>>> value1: " + value1);
+
+      try {
+        os.println("set " + key1 + " " + value1);
+        String response = is.readLine();
+        System.out.println("<<<KeyStoreValueSO>>> response: " + response);
+
+        if ("OK".equals(response)) {
+          return Status.OK;
+        } else {
+          return Status.ERROR;
+        }
+      } catch(UnknownHostException e) {
+        System.err.println("ERROR: Trying to connect to unknown host " + e);
+      } catch (IOException e) {
+        System.err.println("ERROR: IOException - " + e);
+      }
+    }
+
     System.out.println("<<<KeyStoreValueSO>>> UPDATE");
-    throw new UnsupportedOperationException("OPERACION UPDATE NO SOPORTADA.");
+
+    return Status.OK;
   }
 
   @Override

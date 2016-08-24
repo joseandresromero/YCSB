@@ -1,0 +1,12 @@
+<<<KeyStoreValueSO>>> INIT
+<<<KeyStoreValueSO>>> puerto: 1234
+<<<KeyStoreValueSO>>> ip: 127.0.0.1
+<<<KeyStoreValueSO>>> table: usertable
+<<<KeyStoreValueSO>>> key: user3338649943509629245
+java.lang.NullPointerException
+	at com.yahoo.ycsb.db.KeyValueStoreSOClient.read(KeyValueStoreSOClient.java:107)
+	at com.yahoo.ycsb.DBWrapper.read(DBWrapper.java:151)
+	at com.yahoo.ycsb.workloads.CoreWorkload.doTransactionRead(CoreWorkload.java:708)
+	at com.yahoo.ycsb.workloads.CoreWorkload.doTransaction(CoreWorkload.java:630)
+	at com.yahoo.ycsb.ClientThread.run(Client.java:458)
+	at java.lang.Thread.run(Thread.java:745)
