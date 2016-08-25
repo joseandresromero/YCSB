@@ -104,22 +104,18 @@ public class KeyValueStoreSOClient extends DB {
     System.out.println("<<<KeyStoreValueSO>>> table: " + table);
     System.out.println("<<<KeyStoreValueSO>>> key: " + key);
 
-    for(String field : fields) {
-      System.out.println("<<<KeyStoreValueSO>>> field: " + field);
+    try {
+      os.println("get " + key);
+      String response = is.readLine();
+      System.out.println("<<<KeyStoreValueSO>>> response: " + response);
 
-      try {
-        os.println("get " + field);
-        String response = is.readLine();
-        System.out.println("<<<KeyStoreValueSO>>> response: " + response);
-
-        if (!"Key=".equals(response)) {
-          result.put(field, new StringByteIterator(response));
-        }
-      } catch(UnknownHostException e) {
-        System.err.println("ERROR: Trying to connect to unknown host " + e);
-      } catch (IOException e) {
-        System.err.println("ERROR: IOException - " + e);
+      if (!"Key=".equals(response)) {
+        result.put(key, new StringByteIterator(response));
       }
+    } catch(UnknownHostException e) {
+      System.err.println("ERROR: Trying to connect to unknown host " + e);
+    } catch (IOException e) {
+      System.err.println("ERROR: IOException - " + e);
     }
 
     System.out.println("<<<KeyStoreValueSO>>> READ");
@@ -140,7 +136,7 @@ public class KeyValueStoreSOClient extends DB {
       System.out.println("<<<KeyStoreValueSO>>> value1: " + value1);
 
       try {
-        os.println("set " + key1 + " " + value1);
+        os.println("set " + key + " " + value1);
         String response = is.readLine();
         System.out.println("<<<KeyStoreValueSO>>> response: " + response);
 
@@ -182,7 +178,7 @@ public class KeyValueStoreSOClient extends DB {
       System.out.println("<<<KeyStoreValueSO>>> value1: " + value1);
 
       try {
-        os.println("set " + key1 + " " + value1);
+        os.println("set " + key + " " + value1);
         String response = is.readLine();
         System.out.println("<<<KeyStoreValueSO>>> response: " + response);
 
